@@ -1,0 +1,44 @@
+name: Tests
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.image }} / Python ${{ matrix.python }}
+    runs-on: ubuntu-24.04
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - 'debian:12'
+          - 'debian:13'
+          - 'ubuntu:22.04'
+          - 'ubuntu:24.04'
+          - 'ubuntu:26.04'
+          - 'ubuntu:26.10'
+        python:
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+    steps:
+      - name: Install container prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates curl git make xz-utils
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install_args: python@${{ matrix.python }}
+      - name: Install project dependencies
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+        run: mise exec "python@$PYTHON_VERSION" -- make venv.install
+      - name: Run tests
+        run: make test

@@ -428,6 +428,19 @@ targets in order.
 Keep each target runnable on its own and update the corresponding target when
 adding a formatter, linter, or Python test suite.
 
+### Pull request checks
+
+- Use GitHub Actions with the `pull_request` event to run the full test
+  workflow on pull requests.
+- Keep workflow steps focused on checking out code and provisioning the
+  OS and Python. Use `make venv.install` and `make test` for project
+  setup and checks. Give the test suite local defaults in the Makefile.
+- Test every combination of supported Python minor versions and Linux
+  releases. Use maintained stable Python releases supported by both the
+  project and its Django version. Include Debian stable and Debian LTS
+  releases, plus Ubuntu releases in standard support, including interim
+  releases. Update the matrix as support changes.
+
 ## Code Quality and Formatting
 
 Use Ruff for linting and formatting.

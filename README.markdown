@@ -46,8 +46,12 @@ running with debug mode off.
 
 ## Checks
 
-Run `make test` from the repository root after `make venv.install` and
-setting `DJANGO_SECRET_KEY` as shown above. It uses `.venv` directly and reformats
-Python files, runs Ruff lint checks, and then runs the Django test suite.
+Run `make test` from the repository root after `make venv.install`.
+It uses `.venv` directly to format Python files, run Ruff lint checks,
+and run the Django test suite. The suite uses an in-memory SQLite database
+and a temporary secret key by default.
 Run `make test.format`, `make test.lint`, or `make test.python` to run a
 single step.
+
+GitHub Actions runs the same Make targets on pull requests across the
+supported Python, Debian, and Ubuntu versions.

@@ -33,4 +33,6 @@ test.format:
 	"$(PYTHON)" -m ruff format --no-cache src/
 
 test.python:
+	DJANGO_DATABASE_PATH="$${DJANGO_DATABASE_PATH:-:memory:}" \
+	DJANGO_SECRET_KEY=$(LOCAL_SECRET_KEY) \
 	"$(PYTHON)" -B src/manage.py test django_media_tracker
