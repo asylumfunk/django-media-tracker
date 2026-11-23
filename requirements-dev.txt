@@ -1,0 +1,5 @@
+# Keep these dependencies in sync with the runtime and dev lists in pyproject.toml.
+Django>=5.2,<6.0
+djangorestframework>=3.16,<4.0
+build
+ruff

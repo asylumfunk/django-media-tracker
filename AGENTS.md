@@ -7,6 +7,17 @@ Framework (DRF).
 
 The Django project is named `django_media_tracker`.
 
+The root Makefile must provide a phony `run` target that starts Django's
+development server through `$(PYTHON)` on Django's default address and
+port. Use `make run` in development instructions. Supply debug mode and
+a temporary secret key by default while honoring environment overrides.
+
+The root Makefile must provide a phony `migrate` target that applies
+pending Django migrations to the local development database through
+`$(PYTHON)`. Use `make migrate` in development instructions. The default
+database is `src/db.sqlite3`, with `DJANGO_DATABASE_PATH` available as an
+override.
+
 ## Project Structure
 
 ### High-level
@@ -25,7 +36,7 @@ Use the following project structure as the architectural convention:
 ```text
 django-media-tracker/
 ├── AGENTS.md
-├── README.md
+├── README.markdown
 ├── pyproject.toml
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -107,6 +118,15 @@ django-media-tracker/
 - Avoid global mutable state.
 - Avoid mutable default arguments.
 
+### Collection Formatting
+
+- Write non-empty collection literals across multiple lines, with one item
+  per line and the closing delimiter on its own line. Include a trailing
+  comma after the final item where the syntax supports it.
+- Write empty collections on a single line.
+- Apply the same layout to TOML arrays. Use standard TOML tables for
+  non-empty mappings so each entry can be on its own line.
+
 ### Libaries
 
 - Use standard library functionality whenever practical.
@@ -173,6 +193,24 @@ Configure formatting and linting tools to respect these conventions.
     - Link to external documentation sources when relevant.
 - Prefer comments that explain why something is necessary rather than restating
   what the code does.
+
+#### Docstrings
+
+- Use triple double quotes
+- Put docstring opening and closing double quotes on their own lines.
+    - Start the summary on the line after the opening quotes.
+- Ruff checks the quotes and summary placement for multiline docstrings.
+- The Django test suite also checks for single-line docstrings in Python
+  files listed by Git.
+
+Examples:
+
+```python
+"""
+Format docstrings to always be multiple lines.
+"""
+```
+
 
 ## Django Best Practices
 
@@ -300,7 +338,9 @@ Example configuration:
 
 ```toml
 [build-system]
-requires = ['setuptools>=68']
+requires = [
+    'setuptools>=68',
+]
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -322,11 +362,13 @@ dev = [
     'mypy',
 ]
 
-[tool.setuptools]
-package-dir = {'' = 'src'}
+[tool.setuptools.package-dir]
+'' = 'src'
 
 [tool.setuptools.packages.find]
-where = ['src']
+where = [
+    'src',
+]
 include = [
     'django_media_tracker*',
 ]
@@ -344,15 +386,11 @@ versions.
 - Avoid unnecessary dependencies.
 - Review dependency changes before introducing them.
 
-Typical development installation:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-
-python -m pip install --upgrade pip setuptools
-python -m pip install -e '.[dev]'
-```
+The root Makefile must provide `make venv` to create `./.venv` if needed
+and `make venv.install` to install `requirements-dev.txt` into it. Set
+`PYTHON` in the Makefile to the virtual environment's interpreter and use
+`$(PYTHON)` in every recipe that runs Python or Python-based tools. The
+`venv` recipe uses a bootstrap interpreter to create the environment.
 
 If requirements files are used, maintain them consistently with the
 dependencies declared in `pyproject.toml`.
@@ -379,19 +417,16 @@ dependencies declared in `pyproject.toml`.
 - Use mocks or fakes to isolate external dependencies.
 - Do not introduce unnecessary test fixtures or complex test infrastructure.
 
-Run Django tests using:
+Run `make test` from the repository root for the full workflow. The root
+`Makefile` must provide a phony `test` target that runs the following phony
+targets in order.
 
-```bash
-python src/manage.py test
-```
+1. `make test.format` applies the project's formatting conventions to the codebase.
+2. `make test.lint` runs all configured lint checks.
+3. `make test.python` runs all configured Python test suites.
 
-If using pytest:
-
-bash
-
-```bash
-pytest src/
-```
+Keep each target runnable on its own and update the corresponding target when
+adding a formatter, linter, or Python test suite.
 
 ## Code Quality and Formatting
 
@@ -407,18 +442,8 @@ Configure Ruff in `pyproject.toml`.
 - Use type checking where practical.
 - Maintain meaningful test coverage.
 
-Run checks using:
-
-```bash
-ruff check src/
-ruff format --check src/
-```
-
-Apply formatting using:
-
-```bash
-ruff format src/
-```
+Run lint checks with `make test.lint` and apply formatting with
+`make test.format`.
 
 Ensure the formatter configuration preserves the project's quoting conventions.
 
@@ -436,6 +461,12 @@ strings to ensure they use double quotes.
 
 ## Git and Repository Hygiene
 
+- Use the `.markdown` extension for Markdown files, such as
+  `README.markdown`. Keep a different extension when a specification
+  requires it, as with `AGENTS.md`.
+- Update references when renaming Markdown files, including paths in
+  packaging metadata.
+
 - Keep changes focused and logically organized.
 - Avoid unrelated refactoring.
 - Do not commit generated files, caches, virtual environments, or secrets.
@@ -447,7 +478,14 @@ strings to ensure they use double quotes.
 The `.gitignore` file defines files and directories that must be treated as
 inaccessible.
 
-**Never read or write files referenced by****`.gitignore`****.**
+**Never read or write ignored files outside the exceptions below.**
+
+The repository-root `.venv` may be created, updated, and used for project
+development commands and dependency installation.
+
+The default local SQLite database at `src/db.sqlite3` may be created,
+read, and modified for project development, including migrations. Keep it
+ignored and never commit it to source control.
 
 This prohibition includes:
 
@@ -462,7 +500,7 @@ This prohibition includes:
 Before accessing an existing file or directory:
 
 1. Check whether its path is excluded by `.gitignore`.
-2. If it is excluded, do not access it.
+2. If it is excluded, access it only if one of the exceptions above applies.
 3. Do not attempt to circumvent ignore rules using alternative commands,
 scripts, or tools.
 4. If a requested task requires accessing an ignored file, stop and explain the
@@ -505,7 +543,7 @@ When working on this project:
 11. Generate and review migrations when modifying models.
 12. Update documentation when changing application behavior or configuration.
 13. Run relevant tests and quality checks after making changes.
-14. Never access ignored files, even when troubleshooting or debugging.
+14. Follow the ignored-file protection and its documented exceptions.
 15. Report any tests or checks that could not be executed.
 
 When implementing a feature, prefer the smallest maintainable change that
