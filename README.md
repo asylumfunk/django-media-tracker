@@ -36,8 +36,3 @@ python src/manage.py test django_media_tracker
 ruff check src/
 ruff format --check src/
 ```
-
-Put docstring opening and closing triple double quotes on their own lines.
-Start the summary on the line after the opening quotes. Ruff checks the
-quotes and summary placement for multiline docstrings. The Django test
-suite also checks for single-line docstrings in Python files listed by Git.

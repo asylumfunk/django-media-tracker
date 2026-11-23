@@ -174,6 +174,24 @@ Configure formatting and linting tools to respect these conventions.
 - Prefer comments that explain why something is necessary rather than restating
   what the code does.
 
+#### Docstrings
+
+- Use triple double quotes
+- Put docstring opening and closing double quotes on their own lines.
+    - Start the summary on the line after the opening quotes.
+- Ruff checks the quotes and summary placement for multiline docstrings.
+- The Django test suite also checks for single-line docstrings in Python
+  files listed by Git.
+
+Examples:
+
+```python
+"""
+Format docstrings to always be multiple lines.
+"""
+```
+
+
 ## Django Best Practices
 
 ### Architecture
