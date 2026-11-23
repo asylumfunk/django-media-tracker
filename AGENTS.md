@@ -168,9 +168,9 @@ Configure formatting and linting tools to respect these conventions.
 
 ### Documentation
 
-- Use docstrings for public classes, functions, and modules when they provide
-  useful context.
+- Use docstrings for public classes, functions, and modules.
 - Document non-obvious behavior and architectural decisions.
+    - Link to external documentation sources when relevant.
 - Prefer comments that explain why something is necessary rather than restating
   what the code does.
 
