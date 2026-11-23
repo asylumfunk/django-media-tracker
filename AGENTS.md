@@ -25,7 +25,7 @@ Use the following project structure as the architectural convention:
 ```text
 django-media-tracker/
 ├── AGENTS.md
-├── README.md
+├── README.markdown
 ├── pyproject.toml
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -440,6 +440,12 @@ strings to ensure they use double quotes.
 - Never log passwords, authentication tokens, or other sensitive information.
 
 ## Git and Repository Hygiene
+
+- Use the `.markdown` extension for Markdown files, such as
+  `README.markdown`. Keep a different extension when a specification
+  requires it, as with `AGENTS.md`.
+- Update references when renaming Markdown files, including paths in
+  packaging metadata.
 
 - Keep changes focused and logically organized.
 - Avoid unrelated refactoring.

@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = 'django-media-tracker'
 version = '0.1.0'
 description = 'A Django application for tracking media collections'
-readme = 'README.md'
+readme = {file = 'README.markdown', content-type = 'text/markdown'}
 requires-python = '>=3.11'
 dependencies = [
     'Django>=5.2,<6.0',
