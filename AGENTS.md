@@ -397,19 +397,16 @@ dependencies declared in `pyproject.toml`.
 - Use mocks or fakes to isolate external dependencies.
 - Do not introduce unnecessary test fixtures or complex test infrastructure.
 
-Run Django tests using:
+Run `make test` from the repository root for the full workflow. The root
+`Makefile` must provide a phony `test` target that runs the following phony
+targets in order.
 
-```bash
-python src/manage.py test
-```
+1. `make test.format` applies the project's formatting conventions to the codebase.
+2. `make test.lint` runs all configured lint checks.
+3. `make test.python` runs all configured Python test suites.
 
-If using pytest:
-
-bash
-
-```bash
-pytest src/
-```
+Keep each target runnable on its own and update the corresponding target when
+adding a formatter, linter, or Python test suite.
 
 ## Code Quality and Formatting
 
@@ -425,18 +422,8 @@ Configure Ruff in `pyproject.toml`.
 - Use type checking where practical.
 - Maintain meaningful test coverage.
 
-Run checks using:
-
-```bash
-ruff check src/
-ruff format --check src/
-```
-
-Apply formatting using:
-
-```bash
-ruff format src/
-```
+Run lint checks with `make test.lint` and apply formatting with
+`make test.format`.
 
 Ensure the formatter configuration preserves the project's quoting conventions.
 

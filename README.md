@@ -31,8 +31,8 @@ Set `DJANGO_DATABASE_PATH` to use another path.
 
 ## Checks
 
-```sh
-python src/manage.py test django_media_tracker
-ruff check src/
-ruff format --check src/
-```
+Run `make test` from the repository root after activating the virtual
+environment and setting `DJANGO_SECRET_KEY` as shown above. It reformats
+Python files, runs Ruff lint checks, and then runs the Django test suite.
+Run `make test.format`, `make test.lint`, or `make test.python` to run a
+single step.
