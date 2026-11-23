@@ -112,6 +112,17 @@ django-media-tracker/
 - Use standard library functionality whenever practical.
 - Use `pathlib` instead of `os.path` for filesystem operations where practical.
 
+#### Imports
+
+Import only a single object from each from/import statement.
+
+Examples:
+
+```python
+from rest_framework.decorators import api_view
+from rest_framework.decorators import germission_classes
+```
+
 ### String Quoting
 
 Use the following quoting conventions consistently:
