@@ -26,7 +26,14 @@ exclude = ['django_media_tracker.tests*', 'django_media_tracker.*.tests*']
 namespaces = false
 
 [tool.ruff.lint]
-select = ['E', 'F', 'I']
+select = [
+    'D209',
+    'D213',
+    'D300',
+    'E',
+    'F',
+    'I',
+]
 
 [tool.ruff.lint.isort]
 force-single-line = true

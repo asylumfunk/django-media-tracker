@@ -1,4 +1,6 @@
-"""ASGI entry point for the project."""
+"""
+ASGI entry point for the project.
+"""
 
 import os
 

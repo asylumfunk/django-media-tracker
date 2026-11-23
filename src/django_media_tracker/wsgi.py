@@ -1,4 +1,6 @@
-"""WSGI entry point for the project."""
+"""
+WSGI entry point for the project.
+"""
 
 import os
 

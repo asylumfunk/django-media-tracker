@@ -1,4 +1,6 @@
-"""Django settings shared by local and deployed environments."""
+"""
+Django settings shared by local and deployed environments.
+"""
 
 import os
 from pathlib import Path

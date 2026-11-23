@@ -1,4 +1,6 @@
-"""Routes for the admin site and the API health check."""
+"""
+Routes for the admin site and the API health check.
+"""
 
 from django.contrib import admin
 from django.urls import path
@@ -14,7 +16,9 @@ from rest_framework.response import Response
 @authentication_classes([])
 @permission_classes([AllowAny])
 def health(request: Request) -> Response:
-    """Report that the API can serve requests."""
+    """
+    Report that the API can serve requests.
+    """
     return Response({'status': 'ok'})
 
 
