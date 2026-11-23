@@ -90,6 +90,7 @@ django-media-tracker/
 - Name test modules using the `test_*.py` convention.
 - Organize tests by the component being tested.
 - Keep tests independent, deterministic, and repeatable.
+- Write tests for all new code; set a goal of 100% test coverage.
 
 ## Python Coding Standards
 
