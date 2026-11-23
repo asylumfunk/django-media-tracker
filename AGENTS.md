@@ -107,6 +107,15 @@ django-media-tracker/
 - Avoid global mutable state.
 - Avoid mutable default arguments.
 
+### Collection Formatting
+
+- Write non-empty collection literals across multiple lines, with one item
+  per line and the closing delimiter on its own line. Include a trailing
+  comma after the final item where the syntax supports it.
+- Write empty collections on a single line.
+- Apply the same layout to TOML arrays. Use standard TOML tables for
+  non-empty mappings so each entry can be on its own line.
+
 ### Libaries
 
 - Use standard library functionality whenever practical.
@@ -318,7 +327,9 @@ Example configuration:
 
 ```toml
 [build-system]
-requires = ['setuptools>=68']
+requires = [
+    'setuptools>=68',
+]
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -340,11 +351,13 @@ dev = [
     'mypy',
 ]
 
-[tool.setuptools]
-package-dir = {'' = 'src'}
+[tool.setuptools.package-dir]
+'' = 'src'
 
 [tool.setuptools.packages.find]
-where = ['src']
+where = [
+    'src',
+]
 include = [
     'django_media_tracker*',
 ]

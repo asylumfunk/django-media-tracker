@@ -19,7 +19,12 @@ class HealthTests(APISimpleTestCase):
         response = self.client.get(reverse('health'))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), {'status': 'ok'})
+        self.assertEqual(
+            response.json(),
+            {
+                'status': 'ok',
+            },
+        )
 
     def test_post_is_rejected(self) -> None:
         """

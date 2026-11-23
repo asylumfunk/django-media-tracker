@@ -12,14 +12,26 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 
-@api_view(['GET'])
+@api_view(
+    [
+        'GET',
+    ],
+)
 @authentication_classes([])
-@permission_classes([AllowAny])
+@permission_classes(
+    [
+        AllowAny,
+    ],
+)
 def health(request: Request) -> Response:
     """
     Report that the API can serve requests.
     """
-    return Response({'status': 'ok'})
+    return Response(
+        {
+            'status': 'ok',
+        },
+    )
 
 
 urlpatterns = [

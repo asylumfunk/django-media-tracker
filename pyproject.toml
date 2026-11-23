@@ -1,28 +1,43 @@
 [build-system]
-requires = ['setuptools>=68']
+requires = [
+    'setuptools>=68',
+]
 build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'django-media-tracker'
 version = '0.1.0'
 description = 'A Django application for tracking media collections'
-readme = {file = 'README.markdown', content-type = 'text/markdown'}
 requires-python = '>=3.11'
 dependencies = [
     'Django>=5.2,<6.0',
     'djangorestframework>=3.16,<4.0',
 ]
 
-[project.optional-dependencies]
-dev = ['build', 'ruff']
+[project.readme]
+file = 'README.markdown'
+content-type = 'text/markdown'
 
-[tool.setuptools]
-package-dir = {'' = 'src'}
+[project.optional-dependencies]
+dev = [
+    'build',
+    'ruff',
+]
+
+[tool.setuptools.package-dir]
+'' = 'src'
 
 [tool.setuptools.packages.find]
-where = ['src']
-include = ['django_media_tracker*']
-exclude = ['django_media_tracker.tests*', 'django_media_tracker.*.tests*']
+where = [
+    'src',
+]
+include = [
+    'django_media_tracker*',
+]
+exclude = [
+    'django_media_tracker.tests*',
+    'django_media_tracker.*.tests*',
+]
 namespaces = false
 
 [tool.ruff.lint]
