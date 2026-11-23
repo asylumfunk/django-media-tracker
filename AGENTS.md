@@ -362,15 +362,11 @@ versions.
 - Avoid unnecessary dependencies.
 - Review dependency changes before introducing them.
 
-Typical development installation:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-
-python -m pip install --upgrade pip setuptools
-python -m pip install -e '.[dev]'
-```
+The root Makefile must provide `make venv` to create `./.venv` if needed
+and `make venv.install` to install `requirements-dev.txt` into it. Set
+`PYTHON` in the Makefile to the virtual environment's interpreter and use
+`$(PYTHON)` in every recipe that runs Python or Python-based tools. The
+`venv` recipe uses a bootstrap interpreter to create the environment.
 
 If requirements files are used, maintain them consistently with the
 dependencies declared in `pyproject.toml`.
@@ -458,7 +454,10 @@ strings to ensure they use double quotes.
 The `.gitignore` file defines files and directories that must be treated as
 inaccessible.
 
-**Never read or write files referenced by****`.gitignore`****.**
+**Never read or write ignored files outside the exception below.**
+
+The repository-root `.venv` may be created, updated, and used for project
+development commands and dependency installation.
 
 This prohibition includes:
 
@@ -473,7 +472,7 @@ This prohibition includes:
 Before accessing an existing file or directory:
 
 1. Check whether its path is excluded by `.gitignore`.
-2. If it is excluded, do not access it.
+2. If it is excluded, access it only if the `.venv` exception applies.
 3. Do not attempt to circumvent ignore rules using alternative commands,
 scripts, or tools.
 4. If a requested task requires accessing an ignored file, stop and explain the
@@ -516,7 +515,7 @@ When working on this project:
 11. Generate and review migrations when modifying models.
 12. Update documentation when changing application behavior or configuration.
 13. Run relevant tests and quality checks after making changes.
-14. Never access ignored files, even when troubleshooting or debugging.
+14. Follow the ignored-file protection and its `.venv` exception.
 15. Report any tests or checks that could not be executed.
 
 When implementing a feature, prefer the smallest maintainable change that

@@ -1,4 +1,16 @@
-.PHONY: test test.lint test.format test.python
+.DEFAULT_GOAL := test
+
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+BOOTSTRAP_PYTHON ?= python3
+
+.PHONY: venv venv.install test test.lint test.format test.python
+
+venv:
+	@if [ ! -x "$(PYTHON)" ]; then $(BOOTSTRAP_PYTHON) -m venv "$(VENV)"; fi
+
+venv.install: venv
+	"$(PYTHON)" -m pip install -r requirements-dev.txt
 
 test:
 	$(MAKE) test.format
@@ -6,10 +18,10 @@ test:
 	$(MAKE) test.python
 
 test.lint:
-	ruff check --no-cache src/
+	"$(PYTHON)" -m ruff check --no-cache src/
 
 test.format:
-	ruff format --no-cache src/
+	"$(PYTHON)" -m ruff format --no-cache src/
 
 test.python:
-	python -B src/manage.py test django_media_tracker
+	"$(PYTHON)" -B src/manage.py test django_media_tracker

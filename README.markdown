@@ -8,9 +8,8 @@ The media app is registered and ready for collection models.
 Use Python 3.11 or newer. Run these commands from the repository root.
 
 ```sh
-python -m venv .venv
+make venv.install
 source .venv/bin/activate
-python -m pip install -r requirements-dev.txt
 
 export DJANGO_SECRET_KEY="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')"
 export DJANGO_DEBUG=1
@@ -18,6 +17,11 @@ export DJANGO_DEBUG=1
 python src/manage.py migrate
 python src/manage.py runserver
 ```
+
+`make venv` creates `.venv` if needed. `make venv.install` also installs
+the runtime and development dependencies into it. The Django commands
+above run the application directly from `src/`. Set `BOOTSTRAP_PYTHON`
+when creating the environment to choose a Python other than `python3`.
 
 Send a GET request to `http://127.0.0.1:8000/api/health/` for
 `{"status": "ok"}`. The endpoint checks that the API responds and does not
@@ -31,8 +35,8 @@ Set `DJANGO_DATABASE_PATH` to use another path.
 
 ## Checks
 
-Run `make test` from the repository root after activating the virtual
-environment and setting `DJANGO_SECRET_KEY` as shown above. It reformats
+Run `make test` from the repository root after `make venv.install` and
+setting `DJANGO_SECRET_KEY` as shown above. It uses `.venv` directly and reformats
 Python files, runs Ruff lint checks, and then runs the Django test suite.
 Run `make test.format`, `make test.lint`, or `make test.python` to run a
 single step.
