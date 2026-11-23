@@ -7,6 +7,11 @@ Framework (DRF).
 
 The Django project is named `django_media_tracker`.
 
+The root Makefile must provide a phony `run` target that starts Django's
+development server through `$(PYTHON)` on Django's default address and
+port. Use `make run` in development instructions. Supply debug mode and
+a temporary secret key by default while honoring environment overrides.
+
 ## Project Structure
 
 ### High-level

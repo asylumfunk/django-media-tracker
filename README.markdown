@@ -9,13 +9,23 @@ Use Python 3.11 or newer. Run these commands from the repository root.
 
 ```sh
 make venv.install
+make run
+```
+
+`make run` starts Django at `http://127.0.0.1:8000/` using the project
+virtual environment. It enables debug mode and generates a temporary
+secret key by default. Set `DJANGO_DEBUG` or `DJANGO_SECRET_KEY` to
+override those defaults.
+
+To apply migrations or run other management commands directly, activate
+the environment and set a secret key.
+
+```sh
 source .venv/bin/activate
 
 export DJANGO_SECRET_KEY="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')"
-export DJANGO_DEBUG=1
 
 python src/manage.py migrate
-python src/manage.py runserver
 ```
 
 `make venv` creates `.venv` if needed. `make venv.install` also installs
@@ -28,7 +38,8 @@ Send a GET request to `http://127.0.0.1:8000/api/health/` for
 query the database. To sign in at `http://127.0.0.1:8000/admin/`, first run
 `python src/manage.py createsuperuser`.
 
-`DJANGO_SECRET_KEY` is required. Debug mode is off unless `DJANGO_DEBUG=1`.
+`DJANGO_SECRET_KEY` is required for direct Django commands. Django settings
+enable debug mode when `DJANGO_DEBUG=1`.
 Set `DJANGO_ALLOWED_HOSTS` to a space-separated list of hostnames when
 running with debug mode off. SQLite defaults to `src/db.sqlite3`.
 Set `DJANGO_DATABASE_PATH` to use another path.
