@@ -12,6 +12,12 @@ development server through `$(PYTHON)` on Django's default address and
 port. Use `make run` in development instructions. Supply debug mode and
 a temporary secret key by default while honoring environment overrides.
 
+The root Makefile must provide a phony `migrate` target that applies
+pending Django migrations to the local development database through
+`$(PYTHON)`. Use `make migrate` in development instructions. The default
+database is `src/db.sqlite3`, with `DJANGO_DATABASE_PATH` available as an
+override.
+
 ## Project Structure
 
 ### High-level
@@ -472,10 +478,14 @@ strings to ensure they use double quotes.
 The `.gitignore` file defines files and directories that must be treated as
 inaccessible.
 
-**Never read or write ignored files outside the exception below.**
+**Never read or write ignored files outside the exceptions below.**
 
 The repository-root `.venv` may be created, updated, and used for project
 development commands and dependency installation.
+
+The default local SQLite database at `src/db.sqlite3` may be created,
+read, and modified for project development, including migrations. Keep it
+ignored and never commit it to source control.
 
 This prohibition includes:
 
@@ -490,7 +500,7 @@ This prohibition includes:
 Before accessing an existing file or directory:
 
 1. Check whether its path is excluded by `.gitignore`.
-2. If it is excluded, access it only if the `.venv` exception applies.
+2. If it is excluded, access it only if one of the exceptions above applies.
 3. Do not attempt to circumvent ignore rules using alternative commands,
 scripts, or tools.
 4. If a requested task requires accessing an ignored file, stop and explain the
@@ -533,7 +543,7 @@ When working on this project:
 11. Generate and review migrations when modifying models.
 12. Update documentation when changing application behavior or configuration.
 13. Run relevant tests and quality checks after making changes.
-14. Follow the ignored-file protection and its `.venv` exception.
+14. Follow the ignored-file protection and its documented exceptions.
 15. Report any tests or checks that could not be executed.
 
 When implementing a feature, prefer the smallest maintainable change that
