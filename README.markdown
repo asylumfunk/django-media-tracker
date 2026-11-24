@@ -9,7 +9,7 @@ Use Python 3.11 or newer. Run these commands from the repository root.
 
 ```sh
 make venv.install
-make migrate
+make data.migrate
 make run
 ```
 
@@ -18,7 +18,7 @@ virtual environment. It enables debug mode and generates a temporary
 secret key by default. Set `DJANGO_DEBUG` or `DJANGO_SECRET_KEY` to
 override those defaults.
 
-`make migrate` applies pending migrations to the local SQLite database
+`make data.migrate` applies pending migrations to the local SQLite database
 at `src/db.sqlite3`. It generates a temporary secret key if
 `DJANGO_SECRET_KEY` is unset. Set `DJANGO_DATABASE_PATH` to use another
 local database file. Keep the database out of source control.
@@ -50,7 +50,7 @@ running with debug mode off.
   fixture at `var/django-db.json`, creating `var/` as needed.
 - `make data.import` loads that fixture into the development database.
   It first copies the existing SQLite file to `var/django-db.sqlite3`.
-  Run `make migrate` first and stop the development server before
+  Run `make data.migrate` first and stop the development server before
   importing so the file is idle during the copy. For a clean restore, use
   a fresh database because importing can update matching records and
   leaves unrelated records in place.

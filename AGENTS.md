@@ -12,9 +12,9 @@ development server through `$(PYTHON)` on Django's default address and
 port. Use `make run` in development instructions. Supply debug mode and
 a temporary secret key by default while honoring environment overrides.
 
-The root Makefile must provide a phony `migrate` target that applies
+The root Makefile must provide a phony `data.migrate` target that applies
 pending Django migrations to the local development database through
-`$(PYTHON)`. Use `make migrate` in development instructions. The default
+`$(PYTHON)`. Use `make data.migrate` in development instructions. The default
 database is `src/db.sqlite3`, with `DJANGO_DATABASE_PATH` available as an
 override.
 
