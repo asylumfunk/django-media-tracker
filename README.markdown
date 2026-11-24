@@ -49,9 +49,11 @@ running with debug mode off.
 - `make data.export` exports the development database as a Django JSON
   fixture at `var/django-db.json`, creating `var/` as needed.
 - `make data.import` loads that fixture into the development database.
-  Run `make migrate` first. For a clean restore, use a fresh database
-  because importing can update matching records and leaves unrelated records
-  in place.
+  It first copies the existing SQLite file to `var/django-db.sqlite3`.
+  Run `make migrate` first and stop the development server before
+  importing so the file is idle during the copy. For a clean restore, use
+  a fresh database because importing can update matching records and
+  leaves unrelated records in place.
 
 Both targets honor `DJANGO_DATABASE_PATH`. The fixture can contain user data
 and password hashes and is kept out of source control.

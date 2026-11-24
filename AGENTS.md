@@ -23,6 +23,9 @@ targets that use `$(PYTHON)` to export and load a Django JSON fixture
 at `var/django-db.json`. Create the root `var/` directory on export.
 Both targets use the local development database and honor
 `DJANGO_DATABASE_PATH`.
+Before loading the fixture, `make data.import` must copy the local SQLite
+database file to `var/django-db.sqlite3` if the source file exists. Stop
+the import if the copy fails.
 
 ## Project Structure
 
