@@ -18,6 +18,12 @@ pending Django migrations to the local development database through
 database is `src/db.sqlite3`, with `DJANGO_DATABASE_PATH` available as an
 override.
 
+The root Makefile must provide phony `data.export` and `data.import`
+targets that use `$(PYTHON)` to export and load a Django JSON fixture
+at `var/django-db.json`. Create the root `var/` directory on export.
+Both targets use the local development database and honor
+`DJANGO_DATABASE_PATH`.
+
 ## Project Structure
 
 ### High-level
@@ -499,6 +505,10 @@ development commands and dependency installation.
 The default local SQLite database at `src/db.sqlite3` may be created,
 read, and modified for project development, including migrations. Keep it
 ignored and never commit it to source control.
+
+The repository-root `var/` directory may be created, read, and written
+for project development. Keep it and its contents ignored and never
+commit them to source control.
 
 This prohibition includes:
 
