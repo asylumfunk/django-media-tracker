@@ -41,4 +41,10 @@ jobs:
           PYTHON_VERSION: ${{ matrix.python }}
         run: mise exec "python@$PYTHON_VERSION" -- make venv.install
       - name: Run tests
+        env:
+          # The container user may differ from the workspace owner.
+          # https://github.com/actions/runner/issues/2033
+          GIT_CONFIG_COUNT: '1'
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: ${{ github.workspace }}
         run: make test
