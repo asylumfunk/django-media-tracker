@@ -7,7 +7,7 @@ LOCAL_SECRET_KEY = "$${DJANGO_SECRET_KEY:-$$("$(PYTHON)" -B -c 'from django.core
 DATA_FILE := var/django-db.json
 DATABASE_BACKUP := var/django-db.sqlite3
 
-.PHONY: venv venv.install run data.migrate data.export data.import test test.lint test.format test.python
+.PHONY: venv venv.install run data.migrations data.migrate data.export data.import test test.lint test.format test.python
 
 venv:
 	@if [ ! -x "$(PYTHON)" ]; then $(BOOTSTRAP_PYTHON) -m venv "$(VENV)"; fi
@@ -19,6 +19,9 @@ run:
 	DJANGO_DEBUG="$${DJANGO_DEBUG:-1}" \
 	DJANGO_SECRET_KEY=$(LOCAL_SECRET_KEY) \
 	"$(PYTHON)" -B src/manage.py runserver
+
+data.migrations:
+	DJANGO_SECRET_KEY=$(LOCAL_SECRET_KEY) "$(PYTHON)" -B src/manage.py makemigrations
 
 data.migrate:
 	DJANGO_SECRET_KEY=$(LOCAL_SECRET_KEY) "$(PYTHON)" -B src/manage.py migrate

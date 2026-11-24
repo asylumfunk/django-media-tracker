@@ -12,6 +12,10 @@ development server through `$(PYTHON)` on Django's default address and
 port. Use `make run` in development instructions. Supply debug mode and
 a temporary secret key by default while honoring environment overrides.
 
+The root Makefile must provide a phony `data.migrations` target that runs
+Django's `makemigrations` through `$(PYTHON)` to generate migration files
+for pending model changes. Use `make data.migrations` after changing models.
+
 The root Makefile must provide a phony `data.migrate` target that applies
 pending Django migrations to the local development database through
 `$(PYTHON)`. Use `make data.migrate` in development instructions. The default

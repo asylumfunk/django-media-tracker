@@ -23,6 +23,10 @@ at `src/db.sqlite3`. It generates a temporary secret key if
 `DJANGO_SECRET_KEY` is unset. Set `DJANGO_DATABASE_PATH` to use another
 local database file. Keep the database out of source control.
 
+After changing models, run `make data.migrations` to generate migration
+files. Review the generated files before applying them with
+`make data.migrate`.
+
 `make venv` creates `.venv` if needed. `make venv.install` also installs
 the runtime and development dependencies into it. The Django commands
 above run the application directly from `src/`. Set `BOOTSTRAP_PYTHON`
