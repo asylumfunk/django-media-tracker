@@ -2,7 +2,7 @@
 
 A starter Django project with Django REST Framework, SQLite, and Django admin.
 The media app is registered and ready for collection models.
-The locales app is a placeholder for language and country reference data.
+The locales app manages reference files for countries, languages, and scripts.
 
 ## Local development
 
@@ -62,6 +62,25 @@ running with debug mode off.
 
 Both targets honor `DJANGO_DATABASE_PATH`. The fixture can contain user data
 and password hashes and is kept out of source control.
+
+## Locale reference files
+
+After installing the development dependencies and setting
+`DJANGO_SECRET_KEY`, run the sync command from the repository root.
+
+```sh
+.venv/bin/python -B src/manage.py locale_sync_files
+```
+
+It refreshes eight files in `etc/`. Use `--help` to see the destination
+options, such as `--un-m-49-path /tmp/country_un-m-49.json`. A download or
+parsing failure preserves the affected file, and the command still attempts
+the other datasets before reporting errors.
+
+The ISO country JSON combines public country datasets and preserves their
+available attributes. ISO 639-1 is derived from alpha-2 entries in the ISO
+639-2 table. UN M49 uses the English overview table, and the IANA registry
+is saved as published.
 
 ## Checks
 
