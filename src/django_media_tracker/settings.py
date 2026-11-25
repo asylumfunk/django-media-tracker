@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_media_tracker.apps.locales.apps.LocalesConfig',
     'django_media_tracker.apps.media.apps.MediaConfig',
 ]
 

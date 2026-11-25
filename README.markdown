@@ -2,6 +2,7 @@
 
 A starter Django project with Django REST Framework, SQLite, and Django admin.
 The media app is registered and ready for collection models.
+The locales app is a placeholder for language and country reference data.
 
 ## Local development
 
