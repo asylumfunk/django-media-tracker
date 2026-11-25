@@ -82,6 +82,17 @@ available attributes. ISO 639-1 is derived from alpha-2 entries in the ISO
 639-2 table. UN M49 uses the English overview table, and the IANA registry
 is saved as published.
 
+The `locales` models store ISO 3166-1 countries and structured BCP 47 tags.
+A tag links to a primary language and can add an extlang, script, region,
+ordered variants, extensions, and a private-use suffix. Numeric UN M49
+regions can stand on their own, as in `es-419`. Primary subtags can record
+their ISO 639-3 language type and IANA deprecation date.
+
+Run `make data.migrate` to create the tables. The sync command refreshes
+files independently of the database. The models cover tags with a primary
+language, with legacy whole tags and private-use-only tags outside this
+schema.
+
 ## Checks
 
 Run `make test` from the repository root after `make venv.install`.
