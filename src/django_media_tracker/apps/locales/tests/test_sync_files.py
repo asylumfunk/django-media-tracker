@@ -34,7 +34,7 @@ class LocaleSyncFilesTests(SimpleTestCase):
         world = '<td>001</td><td>World</td>' + '<td></td>' * 6
         self.registry = (
             b'File-Date: 2026-11-18\n%%\nType: language\nSubtag: zh\n'
-            b'Scope: macrolanguage\n'
+            b'Scope: macrolanguage\nAdded: 2005-10-16\n'
         )
         self.sources = {
             sync_files.ISO_COUNTRY_ASSIGNMENTS_URL: (

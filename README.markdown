@@ -91,8 +91,12 @@ ordered variants, extensions, and a private-use suffix. Numeric UN M49
 regions can stand on their own, as in `es-419`. Primary subtags can record
 their ISO 639-3 language type and IANA deprecation date. Primary and
 extended subtags store IANA scope, defaulting to `individual` when
-`Scope:` is absent. Rerun `locale_sync_db` after migrating to refresh
-scope on existing records.
+`Scope:` is absent.
+
+The database import also stores IANA registration dates (`Added:`) on
+subtags and on whole tags explicitly registered by IANA that the importer
+supports. Rerun `locale_sync_db` after migrating to populate scope and
+registration dates on existing records.
 
 Run `make data.migrate` to create the tables, then import the synced files
 with `.venv/bin/python -B src/manage.py locale_sync_db`. The import uses

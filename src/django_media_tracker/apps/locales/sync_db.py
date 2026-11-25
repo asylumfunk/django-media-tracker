@@ -99,11 +99,11 @@ def language_scope(fields: RegistryRecord) -> LanguageScope:
     return LanguageScope(value) if value else LanguageScope.INDIVIDUAL
 
 
-def deprecation_date(fields: RegistryRecord) -> date | None:
+def registry_date(fields: RegistryRecord, field: str) -> date | None:
     """
-    Convert an IANA deprecation date when one is present.
+    Convert an IANA registration or deprecation date when one is present.
     """
-    value = registry_value(fields, 'Deprecated')
+    value = registry_value(fields, field)
     return date.fromisoformat(value) if value else None
 
 
@@ -183,7 +183,8 @@ def sync_primary_languages(
                 name=names.get(code) or registry_value(record, 'Description'),
                 language_type=language_types.get(code, ''),
                 scope=language_scope(record),
-                deprecated_on=deprecation_date(record),
+                added_on=registry_date(record, 'Added'),
+                deprecated_on=registry_date(record, 'Deprecated'),
                 suppress_script=scripts.get(registry_value(record, 'Suppress-Script')),
             )
             for code, record in registry.items()
@@ -192,6 +193,7 @@ def sync_primary_languages(
         'name',
         'language_type',
         'scope',
+        'added_on',
         'deprecated_on',
         'suppress_script',
     )
@@ -239,6 +241,7 @@ def sync_language_tags(
     for tag, record in registry.get('redundant', {}).items():
         if registry_value(record, 'Deprecated'):
             continue
+        added_on = registry_date(record, 'Added')
         code, *parts = tag.split('-')
         language = primary[code]
         extended = (
@@ -266,16 +269,20 @@ def sync_language_tags(
                 queryset=LanguageVariant.objects.order_by('position'),
             ),
         )
-        if any(
-            [link.variant_id for link in match.variant_links.all()] == variant_ids
+        matching_ids = [
+            match.pk
             for match in matches
-        ):
+            if [link.variant_id for link in match.variant_links.all()] == variant_ids
+        ]
+        if matching_ids:
+            Language.objects.filter(pk__in=matching_ids).update(added_on=added_on)
             continue
         saved = Language.objects.create(
             primary_language=language,
             extlang=extended,
             script=script,
             region=region,
+            added_on=added_on,
         )
         LanguageVariant.objects.bulk_create(
             [
@@ -320,12 +327,14 @@ def sync_database(paths: dict[str, Path]) -> None:
             ScriptSubtag(
                 code=code,
                 name=script_names.get(code) or registry_value(record, 'Description'),
-                deprecated_on=deprecation_date(record),
+                added_on=registry_date(record, 'Added'),
+                deprecated_on=registry_date(record, 'Deprecated'),
             )
             for code, record in registry.get('script', {}).items()
         ],
         'code',
         'name',
+        'added_on',
         'deprecated_on',
     )
     numeric_countries = {
@@ -338,13 +347,15 @@ def sync_database(paths: dict[str, Path]) -> None:
             RegionSubtag(
                 code=code,
                 name=region_names.get(code) or registry_value(record, 'Description'),
-                deprecated_on=deprecation_date(record),
+                added_on=registry_date(record, 'Added'),
+                deprecated_on=registry_date(record, 'Deprecated'),
                 country=countries.get(code) or numeric_countries.get(code),
             )
             for code, record in registry.get('region', {}).items()
         ],
         'code',
         'name',
+        'added_on',
         'deprecated_on',
         'country',
     )
@@ -354,12 +365,14 @@ def sync_database(paths: dict[str, Path]) -> None:
             VariantSubtag(
                 code=code,
                 name=registry_value(record, 'Description'),
-                deprecated_on=deprecation_date(record),
+                added_on=registry_date(record, 'Added'),
+                deprecated_on=registry_date(record, 'Deprecated'),
             )
             for code, record in registry.get('variant', {}).items()
         ],
         'code',
         'name',
+        'added_on',
         'deprecated_on',
     )
     primary = sync_primary_languages(registry['language'], paths, scripts)
@@ -369,6 +382,7 @@ def sync_database(paths: dict[str, Path]) -> None:
                 language=primary[code],
                 prefix=primary[registry_value(record, 'Prefix')],
                 scope=language_scope(record),
+                added_on=registry_date(record, 'Added'),
             )
             for code, record in registry.get('extlang', {}).items()
         ],
@@ -376,6 +390,7 @@ def sync_database(paths: dict[str, Path]) -> None:
         update_fields=[
             'prefix',
             'scope',
+            'added_on',
         ],
         unique_fields=[
             'language',

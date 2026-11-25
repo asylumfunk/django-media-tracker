@@ -3,6 +3,7 @@ Test loading saved locale reference files into the database.
 """
 
 import json
+from datetime import date
 from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -37,7 +38,7 @@ class LocaleSyncDatabaseTests(TestCase):
         self.iana.write_text(
             'File-Date: 2026-11-18\n'
             '%%\nType: language\nSubtag: en\nDescription: English\n'
-            'Suppress-Script: Latn\n'
+            'Suppress-Script: Latn\nAdded: 2005-10-16\n'
             '%%\nType: language\nSubtag: zh\nDescription: Chinese\n'
             'Scope: macrolanguage\n'
             '%%\nType: language\nSubtag: yue\nDescription: Cantonese\n'
@@ -46,11 +47,15 @@ class LocaleSyncDatabaseTests(TestCase):
             '%%\nType: language\nSubtag: iw\nDescription: Hebrew\n'
             'Deprecated: 1989-01-01\n'
             '%%\nType: extlang\nSubtag: yue\nDescription: Cantonese\nPrefix: zh\n'
+            'Added: 2009-07-29\n'
             '%%\nType: region\nSubtag: US\nDescription: United States\n'
+            'Added: 2005-10-16\n'
             '%%\nType: region\nSubtag: 001\nDescription: World\n'
-            '%%\nType: script\nSubtag: Latn\nDescription: Latin\n'
+            '%%\nType: script\nSubtag: Latn\nDescription: Latin\nAdded: 2005-10-16\n'
             '%%\nType: variant\nSubtag: boont\nDescription: Boontling\n'
-            '%%\nType: redundant\nTag: en-boont\nDescription: Boontling\n',
+            'Added: 2006-09-18\n'
+            '%%\nType: redundant\nTag: en-boont\nDescription: Boontling\n'
+            'Added: 2003-02-14\n',
             encoding='utf-8',
         )
         self.write_rows(
@@ -201,6 +206,33 @@ class LocaleSyncDatabaseTests(TestCase):
 
         self.assertFalse(Country.objects.exists())
         self.assertFalse(RegionSubtag.objects.exists())
+
+    def test_registration_dates_are_imported_and_refreshed(self) -> None:
+        """
+        Store the dates for each record and backfill an existing whole tag.
+        """
+        call_command('locale_sync_db', iana_path=self.iana, stdout=StringIO())
+        english = PrimaryLanguageSubtag.objects.get(code='en')
+        self.assertEqual(english.added_on, date(2005, 10, 16))
+        self.assertEqual(english.suppress_script.added_on, date(2005, 10, 16))
+        self.assertEqual(
+            RegionSubtag.objects.get(code='US').added_on, date(2005, 10, 16)
+        )
+        self.assertEqual(
+            ExtendedLanguageSubtag.objects.get(language__code='yue').added_on,
+            date(2009, 7, 29),
+        )
+        bare_tag = Language.objects.get(primary_language=english, variants__isnull=True)
+        self.assertIsNone(bare_tag.added_on)
+        tag = Language.objects.get(primary_language=english, variants__code='boont')
+        self.assertEqual(tag.variants.get().added_on, date(2006, 9, 18))
+        self.assertEqual(tag.added_on, date(2003, 2, 14))
+        Language.objects.filter(pk=tag.pk).update(added_on=None)
+
+        call_command('locale_sync_db', iana_path=self.iana, stdout=StringIO())
+        tag.refresh_from_db()
+
+        self.assertEqual(tag.added_on, date(2003, 2, 14))
 
     def test_extlang_scope_is_refreshed_from_its_own_record(self) -> None:
         """

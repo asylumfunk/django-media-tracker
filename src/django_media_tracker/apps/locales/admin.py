@@ -46,6 +46,7 @@ class SubtagAdmin(admin.ModelAdmin):
     list_display = (
         'code',
         'name',
+        'added_on',
         'deprecated_on',
     )
     search_fields = (
@@ -90,6 +91,7 @@ class ExtendedLanguageSubtagAdmin(admin.ModelAdmin):
         'language',
         'prefix',
         'scope',
+        'added_on',
     )
     list_select_related = (
         'language',
@@ -138,6 +140,7 @@ class LanguageAdmin(admin.ModelAdmin):
         'script',
         'region',
         'private_use',
+        'added_on',
     )
     list_select_related = (
         'primary_language',

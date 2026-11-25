@@ -45,10 +45,11 @@ class Country(models.Model):
 
 class RegisteredSubtag(models.Model):
     """
-    Share the display and deprecation metadata of IANA subtags.
+    Share the display and registration metadata of IANA subtags.
     """
 
     name = models.CharField(max_length=255)
+    added_on = models.DateField(blank=True, null=True)
     deprecated_on = models.DateField(blank=True, null=True)
 
     class Meta:
@@ -152,6 +153,7 @@ class ExtendedLanguageSubtag(models.Model):
         on_delete=models.PROTECT,
         related_name='extended_subtags',
     )
+    added_on = models.DateField(blank=True, null=True)
     scope = models.CharField(
         max_length=13,
         choices=LanguageScope,
@@ -280,6 +282,11 @@ class Language(models.Model):
             RegexValidator(r'\A[a-z0-9]{1,8}(?:-[a-z0-9]{1,8})*\Z'),
         ],
         help_text='Private-use subtags without the x- prefix.',
+    )
+    added_on = models.DateField(
+        blank=True,
+        null=True,
+        help_text='IANA registration date for this whole tag, when available.',
     )
 
     def clean(self) -> None:
