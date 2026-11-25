@@ -65,6 +65,9 @@ and password hashes and is kept out of source control.
 
 ## Locale reference files
 
+Manage countries, language tags, and subtags under **Locales** in Django
+Admin. The language tag form also lets you edit its variants and extensions.
+
 After installing the development dependencies and setting
 `DJANGO_SECRET_KEY`, run the sync command from the repository root.
 
