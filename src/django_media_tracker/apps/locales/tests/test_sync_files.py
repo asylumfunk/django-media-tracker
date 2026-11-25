@@ -32,7 +32,10 @@ class LocaleSyncFilesTests(SimpleTestCase):
         self.output = self.root / 'etc'
         self.enterContext(self.settings(BASE_DIR=self.root / 'src'))
         world = '<td>001</td><td>World</td>' + '<td></td>' * 6
-        self.registry = b'File-Date: 2026-11-18\n%%\nType: language\nSubtag: en\n'
+        self.registry = (
+            b'File-Date: 2026-11-18\n%%\nType: language\nSubtag: zh\n'
+            b'Scope: macrolanguage\n'
+        )
         self.sources = {
             sync_files.ISO_COUNTRY_ASSIGNMENTS_URL: (
                 b'{"3166-1":[{"alpha_2":"AU","alpha_3":"AUS","numeric":"036"}]}'

@@ -79,6 +79,18 @@ class ScriptSubtag(RegisteredSubtag):
     )
 
 
+class LanguageScope(models.TextChoices):
+    """
+    Classify a language subtag using the IANA registry's scope values.
+    """
+
+    INDIVIDUAL = 'individual', 'Individual'
+    MACROLANGUAGE = 'macrolanguage', 'Macrolanguage'
+    COLLECTION = 'collection', 'Collection'
+    SPECIAL = 'special', 'Special'
+    PRIVATE_USE = 'private-use', 'Private use'
+
+
 class PrimaryLanguageSubtag(RegisteredSubtag):
     """
     Represent an IANA primary language subtag and its ISO 639-3 classification.
@@ -104,6 +116,11 @@ class PrimaryLanguageSubtag(RegisteredSubtag):
         ],
     )
     language_type = models.CharField(max_length=1, choices=LanguageType, blank=True)
+    scope = models.CharField(
+        max_length=13,
+        choices=LanguageScope,
+        default=LanguageScope.INDIVIDUAL,
+    )
     suppress_script = models.ForeignKey(
         ScriptSubtag,
         on_delete=models.PROTECT,
@@ -134,6 +151,11 @@ class ExtendedLanguageSubtag(models.Model):
         PrimaryLanguageSubtag,
         on_delete=models.PROTECT,
         related_name='extended_subtags',
+    )
+    scope = models.CharField(
+        max_length=13,
+        choices=LanguageScope,
+        default=LanguageScope.INDIVIDUAL,
     )
 
     def clean(self) -> None:

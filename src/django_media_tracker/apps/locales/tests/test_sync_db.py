@@ -14,6 +14,7 @@ from django.test import TestCase
 from django_media_tracker.apps.locales.models import Country
 from django_media_tracker.apps.locales.models import ExtendedLanguageSubtag
 from django_media_tracker.apps.locales.models import Language
+from django_media_tracker.apps.locales.models import LanguageScope
 from django_media_tracker.apps.locales.models import PrimaryLanguageSubtag
 from django_media_tracker.apps.locales.models import RegionSubtag
 from django_media_tracker.apps.locales.models import ScriptSubtag
@@ -38,9 +39,10 @@ class LocaleSyncDatabaseTests(TestCase):
             '%%\nType: language\nSubtag: en\nDescription: English\n'
             'Suppress-Script: Latn\n'
             '%%\nType: language\nSubtag: zh\nDescription: Chinese\n'
+            'Scope: macrolanguage\n'
             '%%\nType: language\nSubtag: yue\nDescription: Cantonese\n'
             'Macrolanguage: zh\n'
-            '%%\nType: language\nSubtag: cel\nDescription: Celtic\n'
+            '%%\nType: language\nSubtag: cel\nDescription: Celtic\nScope: collection\n'
             '%%\nType: language\nSubtag: iw\nDescription: Hebrew\n'
             'Deprecated: 1989-01-01\n'
             '%%\nType: extlang\nSubtag: yue\nDescription: Cantonese\nPrefix: zh\n'
@@ -157,6 +159,7 @@ class LocaleSyncDatabaseTests(TestCase):
         self.assertEqual(RegionSubtag.objects.get(code='001').name, 'World from M49')
         self.assertIsNone(RegionSubtag.objects.get(code='001').country)
         english = PrimaryLanguageSubtag.objects.get(code='en')
+        self.assertEqual(english.scope, LanguageScope.INDIVIDUAL)
         self.assertEqual(english.name, 'English from Set 1')
         self.assertEqual(
             english.language_type, PrimaryLanguageSubtag.LanguageType.LIVING
@@ -167,6 +170,12 @@ class LocaleSyncDatabaseTests(TestCase):
             PrimaryLanguageSubtag.objects.get(code='cel').name, 'Celtic languages'
         )
         extended = ExtendedLanguageSubtag.objects.get(language__code='yue')
+        self.assertEqual(extended.scope, LanguageScope.INDIVIDUAL)
+        self.assertEqual(extended.prefix.scope, LanguageScope.MACROLANGUAGE)
+        self.assertEqual(
+            PrimaryLanguageSubtag.objects.get(code='cel').scope,
+            LanguageScope.COLLECTION,
+        )
         self.assertEqual(extended.prefix.code, 'zh')
         self.assertEqual(extended.language.macrolanguage, extended.prefix)
         self.assertFalse(Language.objects.filter(primary_language__code='iw').exists())
@@ -192,3 +201,38 @@ class LocaleSyncDatabaseTests(TestCase):
 
         self.assertFalse(Country.objects.exists())
         self.assertFalse(RegionSubtag.objects.exists())
+
+    def test_extlang_scope_is_refreshed_from_its_own_record(self) -> None:
+        """
+        Store an explicit extlang scope and reset it to individual when omitted.
+        """
+        registry = self.iana.read_text(encoding='utf-8')
+        self.iana.write_text(
+            registry.replace('Prefix: zh\n', 'Prefix: zh\nScope: macrolanguage\n'),
+            encoding='utf-8',
+        )
+        call_command('locale_sync_db', iana_path=self.iana, stdout=StringIO())
+        extlang = ExtendedLanguageSubtag.objects.get(language__code='yue')
+        self.assertEqual(extlang.scope, LanguageScope.MACROLANGUAGE)
+        self.assertEqual(extlang.language.scope, LanguageScope.INDIVIDUAL)
+
+        self.iana.write_text(registry, encoding='utf-8')
+        call_command('locale_sync_db', iana_path=self.iana, stdout=StringIO())
+        extlang.refresh_from_db()
+
+        self.assertEqual(extlang.scope, LanguageScope.INDIVIDUAL)
+
+    def test_unknown_scope_rejects_import(self) -> None:
+        """
+        Reject an unknown registry scope without partially loading the database.
+        """
+        registry = self.iana.read_text(encoding='utf-8')
+        self.iana.write_text(
+            registry.replace('Scope: collection', 'Scope: unknown'),
+            encoding='utf-8',
+        )
+        with self.assertRaisesMessage(CommandError, 'unknown'):
+            call_command('locale_sync_db', iana_path=self.iana, stdout=StringIO())
+
+        self.assertFalse(PrimaryLanguageSubtag.objects.exists())
+        self.assertFalse(Country.objects.exists())

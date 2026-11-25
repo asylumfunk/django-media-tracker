@@ -89,7 +89,10 @@ The `locales` models store ISO 3166-1 countries and structured BCP 47 tags.
 A tag links to a primary language and can add an extlang, script, region,
 ordered variants, extensions, and a private-use suffix. Numeric UN M49
 regions can stand on their own, as in `es-419`. Primary subtags can record
-their ISO 639-3 language type and IANA deprecation date.
+their ISO 639-3 language type and IANA deprecation date. Primary and
+extended subtags store IANA scope, defaulting to `individual` when
+`Scope:` is absent. Rerun `locale_sync_db` after migrating to refresh
+scope on existing records.
 
 Run `make data.migrate` to create the tables, then import the synced files
 with `.venv/bin/python -B src/manage.py locale_sync_db`. The import uses

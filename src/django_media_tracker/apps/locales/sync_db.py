@@ -14,6 +14,7 @@ from django.db import transaction
 from django_media_tracker.apps.locales.models import Country
 from django_media_tracker.apps.locales.models import ExtendedLanguageSubtag
 from django_media_tracker.apps.locales.models import Language
+from django_media_tracker.apps.locales.models import LanguageScope
 from django_media_tracker.apps.locales.models import LanguageVariant
 from django_media_tracker.apps.locales.models import PrimaryLanguageSubtag
 from django_media_tracker.apps.locales.models import RegionSubtag
@@ -88,6 +89,14 @@ def registry_value(fields: RegistryRecord, field: str) -> str:
     """
     values = fields.get(field)
     return values[0] if values else ''
+
+
+def language_scope(fields: RegistryRecord) -> LanguageScope:
+    """
+    Use individual scope when IANA omits the field and reject unknown values.
+    """
+    value = registry_value(fields, 'Scope')
+    return LanguageScope(value) if value else LanguageScope.INDIVIDUAL
 
 
 def deprecation_date(fields: RegistryRecord) -> date | None:
@@ -173,6 +182,7 @@ def sync_primary_languages(
                 code=code,
                 name=names.get(code) or registry_value(record, 'Description'),
                 language_type=language_types.get(code, ''),
+                scope=language_scope(record),
                 deprecated_on=deprecation_date(record),
                 suppress_script=scripts.get(registry_value(record, 'Suppress-Script')),
             )
@@ -181,6 +191,7 @@ def sync_primary_languages(
         'code',
         'name',
         'language_type',
+        'scope',
         'deprecated_on',
         'suppress_script',
     )
@@ -357,12 +368,14 @@ def sync_database(paths: dict[str, Path]) -> None:
             ExtendedLanguageSubtag(
                 language=primary[code],
                 prefix=primary[registry_value(record, 'Prefix')],
+                scope=language_scope(record),
             )
             for code, record in registry.get('extlang', {}).items()
         ],
         update_conflicts=True,
         update_fields=[
             'prefix',
+            'scope',
         ],
         unique_fields=[
             'language',

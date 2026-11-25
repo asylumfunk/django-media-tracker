@@ -61,7 +61,10 @@ class PrimaryLanguageSubtagAdmin(SubtagAdmin):
     Browse primary language subtags and edit their registry relationships.
     """
 
-    list_filter = ('language_type',)
+    list_filter = (
+        'language_type',
+        'scope',
+    )
     autocomplete_fields = (
         'macrolanguage',
         'suppress_script',
@@ -86,6 +89,7 @@ class ExtendedLanguageSubtagAdmin(admin.ModelAdmin):
     list_display = (
         'language',
         'prefix',
+        'scope',
     )
     list_select_related = (
         'language',
