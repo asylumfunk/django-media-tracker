@@ -88,10 +88,13 @@ ordered variants, extensions, and a private-use suffix. Numeric UN M49
 regions can stand on their own, as in `es-419`. Primary subtags can record
 their ISO 639-3 language type and IANA deprecation date.
 
-Run `make data.migrate` to create the tables. The sync command refreshes
-files independently of the database. The models cover tags with a primary
-language, with legacy whole tags and private-use-only tags outside this
-schema.
+Run `make data.migrate` to create the tables, then import the synced files
+with `.venv/bin/python -B src/manage.py locale_sync_db`. The import uses
+the same path options and defaults as `locale_sync_files`. It refreshes
+countries and registered subtags, seeds current primary tags and structured
+IANA whole tags, and preserves unrelated rows. If any input fails, the
+database changes roll back. The schema covers tags with a primary language,
+with legacy whole tags and private-use-only tags outside its scope.
 
 ## Checks
 

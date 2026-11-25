@@ -5,11 +5,16 @@ Download and parse published country, language, and script datasets.
 import csv
 import json
 import re
+from argparse import ArgumentParser
 from collections.abc import Callable
+from functools import partial
 from html.parser import HTMLParser
 from io import StringIO
+from pathlib import Path
 from urllib.request import Request
 from urllib.request import urlopen
+
+from django.conf import settings
 
 ISO_COUNTRY_ASSIGNMENTS_URL = (
     'https://salsa.debian.org/iso-codes-team/iso-codes/-/raw/main/data/iso_3166-1.json'
@@ -328,3 +333,68 @@ def load_iana_registry(fetch: Download) -> bytes:
     if not re.match(r'File-Date: [0-9]{4}-[0-9]{2}-[0-9]{2}\r?\n%%\r?\n', text):
         raise ValueError('Invalid IANA language subtag registry header.')
     return contents
+
+
+DATASETS = (
+    (
+        'iso-3166-1',
+        'country_iso-3166-1.json',
+        load_iso_countries,
+    ),
+    (
+        'un-m-49',
+        'country_un-m-49.json',
+        load_m49_countries,
+    ),
+    (
+        'iso-639-1',
+        'language_iso-639-1.json',
+        partial(load_iso_languages, alpha2_only=True),
+    ),
+    (
+        'iso-639-2',
+        'language_iso-639-2.json',
+        load_iso_languages,
+    ),
+    (
+        'iso-639-3',
+        'language_iso-639-3.json',
+        load_iso_639_3,
+    ),
+    (
+        'iso-639-5',
+        'language_iso-639-5.json',
+        load_iso_639_5,
+    ),
+    (
+        'iso-15924',
+        'scripts_iso-15924.json',
+        load_iso_scripts,
+    ),
+    (
+        'iana',
+        'language_iana-subtag-registry.txt',
+        load_iana_registry,
+    ),
+)
+
+
+def add_path_arguments(parser: ArgumentParser, label: str) -> None:
+    """
+    Use the same options and defaults for both locale sync commands.
+    """
+    for name, filename, _ in DATASETS:
+        parser.add_argument(
+            f'--{name}-path',
+            dest=name.replace('-', '_'),
+            type=Path,
+            default=settings.BASE_DIR.parent / 'etc' / filename,
+            help=f'{label} path (default: etc/{filename}).',
+        )
+
+
+def dataset_paths(options: dict[str, str | Path]) -> dict[str, Path]:
+    """
+    Resolve each dataset name to its supplied command argument.
+    """
+    return {name: Path(options[name.replace('-', '_')]) for name, _, _ in DATASETS}
