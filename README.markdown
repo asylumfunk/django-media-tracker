@@ -2,6 +2,7 @@
 
 A starter Django project with Django REST Framework, SQLite, and Django admin.
 The media app is registered and ready for collection models.
+The locales app manages reference files for countries, languages, and scripts.
 
 ## Local development
 
@@ -61,6 +62,49 @@ running with debug mode off.
 
 Both targets honor `DJANGO_DATABASE_PATH`. The fixture can contain user data
 and password hashes and is kept out of source control.
+
+## Locale reference files
+
+Manage countries, language tags, and subtags under **Locales** in Django
+Admin. The language tag form also lets you edit its variants and extensions.
+
+After installing the development dependencies and setting
+`DJANGO_SECRET_KEY`, run the sync command from the repository root.
+
+```sh
+.venv/bin/python -B src/manage.py locale_sync_files
+```
+
+It refreshes eight files in `etc/`. Use `--help` to see the destination
+options, such as `--un-m-49-path /tmp/country_un-m-49.json`. A download or
+parsing failure preserves the affected file, and the command still attempts
+the other datasets before reporting errors.
+
+The ISO country JSON combines public country datasets and preserves their
+available attributes. ISO 639-1 is derived from alpha-2 entries in the ISO
+639-2 table. UN M49 uses the English overview table, and the IANA registry
+is saved as published.
+
+The `locales` models store ISO 3166-1 countries and structured BCP 47 tags.
+A tag links to a primary language and can add an extlang, script, region,
+ordered variants, extensions, and a private-use suffix. Numeric UN M49
+regions can stand on their own, as in `es-419`. Primary subtags can record
+their ISO 639-3 language type and IANA deprecation date. Primary and
+extended subtags store IANA scope, defaulting to `individual` when
+`Scope:` is absent.
+
+The database import also stores IANA registration dates (`Added:`) on
+subtags and on whole tags explicitly registered by IANA that the importer
+supports. Rerun `locale_sync_db` after migrating to populate scope and
+registration dates on existing records.
+
+Run `make data.migrate` to create the tables, then import the synced files
+with `.venv/bin/python -B src/manage.py locale_sync_db`. The import uses
+the same path options and defaults as `locale_sync_files`. It refreshes
+countries and registered subtags, seeds current primary tags and structured
+IANA whole tags, and preserves unrelated rows. If any input fails, the
+database changes roll back. The schema covers tags with a primary language,
+with legacy whole tags and private-use-only tags outside its scope.
 
 ## Checks
 
